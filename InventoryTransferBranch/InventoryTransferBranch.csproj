@@ -50,17 +50,17 @@
     <Reference Include="SAPBusinessOneSDK" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Delivery.b1f">
+    <None Include="DeliverySap.b1f">
       <FormCategory>SystemForm</FormCategory>
     </None>
-    <None Include="Delivery.b1f__orig_srf">
-      <DependentUpon>Delivery.b1f</DependentUpon>
+    <None Include="DeliverySap.b1f__orig_srf">
+      <DependentUpon>DeliverySap.b1f</DependentUpon>
     </None>
     <None Include="Form1.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
-    <Compile Include="Delivery.b1f.cs">
-      <DependentUpon>Delivery.b1f</DependentUpon>
+    <Compile Include="DeliverySap.b1f.cs">
+      <DependentUpon>DeliverySap.b1f</DependentUpon>
     </Compile>
     <Compile Include="DiManager.cs" />
     <Compile Include="Form1.b1f.cs">

@@ -11,10 +11,10 @@ using Application = SAPbouiCOM.Framework.Application;
 
 namespace InventoryTransferBranch
 {
-    [FormAttribute("140", "Delivery.b1f")]
-    class Delivery : SystemFormBase
+    [FormAttribute("140", "DeliverySap.b1f")]
+    class DeliverySap : SystemFormBase
     {
-        public Delivery()
+        public DeliverySap()
         {
         }
 
@@ -36,17 +36,15 @@ namespace InventoryTransferBranch
         {
         }
 
-        private SAPbouiCOM.Button Button0;
-
         private void OnCustomInitialize()
         {
 
         }
 
+        private SAPbouiCOM.Button Button0;
+
         private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-            PostedGRPO ab = new PostedGRPO("1", "2");
-            ab.Show();
             Form deliveryForm = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm;
             if (deliveryForm.Type == 140)
             {
@@ -104,7 +102,7 @@ namespace InventoryTransferBranch
                     deliveryObj.Lines.SetCurrentLine(i);
                     goodsReceiptPo.Lines.ItemCode = deliveryObj.Lines.ItemCode;
                     goodsReceiptPo.Lines.Quantity = deliveryObj.Lines.Quantity;
-                    goodsReceiptPo.Lines.UnitPrice = double.Parse(costs[i],CultureInfo.InvariantCulture);
+                    goodsReceiptPo.Lines.UnitPrice = double.Parse(costs[i], CultureInfo.InvariantCulture);
                     goodsReceiptPo.Lines.WarehouseCode = whs;
                     goodsReceiptPo.Lines.Add();
                 }
@@ -116,7 +114,7 @@ namespace InventoryTransferBranch
                     string docEntry = DiManager.Company.GetNewObjectKey();
                     string docNum;
                     DiManager.Company.GetNewObjectCode(out docNum);
-                    PostedGRPO postedGrpo  = new PostedGRPO(docEntry,docNum);
+                    PostedGRPO postedGrpo = new PostedGRPO(docEntry, docNum);
                     postedGrpo.Show();
                 }
                 var err = DiManager.Company.GetLastErrorDescription();
