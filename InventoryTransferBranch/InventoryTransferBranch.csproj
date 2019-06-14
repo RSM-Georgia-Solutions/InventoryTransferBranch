@@ -50,29 +50,29 @@
     <Reference Include="SAPBusinessOneSDK" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DeliverySap.b1f">
+    <None Include="Forms\DeliverySap.b1f">
       <FormCategory>SystemForm</FormCategory>
     </None>
-    <None Include="DeliverySap.b1f__orig_srf">
+    <None Include="Forms\DeliverySap.b1f__orig_srf">
       <DependentUpon>DeliverySap.b1f</DependentUpon>
     </None>
-    <None Include="Form1.b1f">
-      <FormCategory>UserForm</FormCategory>
-    </None>
-    <Compile Include="DeliverySap.b1f.cs">
+    <Compile Include="Forms\DeliverySap.b1f.cs">
       <DependentUpon>DeliverySap.b1f</DependentUpon>
     </Compile>
     <Compile Include="DiManager.cs" />
-    <Compile Include="Form1.b1f.cs">
-      <DependentUpon>Form1.b1f</DependentUpon>
-    </Compile>
-    <Compile Include="PostedGRPO.b1f.cs">
+    <Compile Include="Forms\PostedGRPO.b1f.cs">
       <DependentUpon>PostedGRPO.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ReturnToGrpo.b1f.cs">
+      <DependentUpon>ReturnToGrpo.b1f</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="PostedGRPO.b1f">
+    <None Include="Forms\PostedGRPO.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Forms\ReturnToGrpo.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
   </ItemGroup>

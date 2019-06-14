@@ -20,7 +20,7 @@ namespace InventoryTransferBranch
                 //DiManager diManager = new DiManager();
                 //diManager.AddField("ODLN", "WareHouse", "WareHouse", BoFieldTypes.db_Alpha, 250, false, true);
                 Menu MyMenu = new Menu();
-                //MyMenu.AddMenuItems();
+                MyMenu.AddMenuItems();
                 oApp.RegisterMenuEventHandler(MyMenu.SBO_Application_MenuEvent);
                 Application.SBO_Application.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(SBO_Application_AppEvent);
                 oApp.Run();

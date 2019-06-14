@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using InventoryTransferBranch.Forms;
 using SAPbouiCOM.Framework;
 
 namespace InventoryTransferBranch
@@ -20,7 +21,7 @@ namespace InventoryTransferBranch
 
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_POPUP;
             oCreationPackage.UniqueID = "InventoryTransferBranch";
-            oCreationPackage.String = "InventoryTransferBranch";
+            oCreationPackage.String = "Inventory Branch Transfer";
             oCreationPackage.Enabled = true;
             oCreationPackage.Position = -1;
 
@@ -44,8 +45,8 @@ namespace InventoryTransferBranch
 
                 // Create s sub menu
                 oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
-                oCreationPackage.UniqueID = "InventoryTransferBranch.Form1";
-                oCreationPackage.String = "Form1";
+                oCreationPackage.UniqueID = "InventoryTransferBranch.Forms.ReturnToGrpo";
+                oCreationPackage.String = "Delivery To GoodsReceipt";
                 oMenus.AddEx(oCreationPackage);
             }
             catch (Exception er)
@@ -60,9 +61,9 @@ namespace InventoryTransferBranch
 
             try
             {
-                if (pVal.BeforeAction && pVal.MenuUID == "InventoryTransferBranch.Form1")
+                if (pVal.BeforeAction && pVal.MenuUID == "InventoryTransferBranch.Forms.ReturnToGrpo")
                 {
-                    Form1 activeForm = new Form1();
+                    ReturnToGrpo activeForm = new ReturnToGrpo();
                     activeForm.Show();
                 }
             }

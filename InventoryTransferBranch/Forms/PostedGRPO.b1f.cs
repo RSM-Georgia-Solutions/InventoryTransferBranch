@@ -6,7 +6,7 @@ using SAPbouiCOM.Framework;
 
 namespace InventoryTransferBranch
 {
-    [FormAttribute("InventoryTransferBranch.PostedGRPO", "PostedGRPO.b1f")]
+    [FormAttribute("InventoryTransferBranch.PostedGRPO", "Forms/PostedGRPO.b1f")]
     class PostedGRPO : UserFormBase
     {
         private readonly string _docEntry;
