@@ -35,6 +35,10 @@
     <StartupObject>InventoryTransferBranch.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Appocalypto, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Appocalypto.1.1.0\lib\net452\Appocalypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ConverterLib_x64">
       <HintPath>C:\Users\nkurdadze\Source\Repos\RS_GE\SAPApi\bin\Debug\ConverterLib_x64.dll</HintPath>
     </Reference>
@@ -75,6 +79,7 @@
     <None Include="Forms\ReturnToGrpo.b1f">
       <FormCategory>UserForm</FormCategory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

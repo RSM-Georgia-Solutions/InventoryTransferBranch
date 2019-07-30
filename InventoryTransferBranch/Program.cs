@@ -22,6 +22,8 @@ namespace InventoryTransferBranch
                 Menu MyMenu = new Menu();
                 MyMenu.AddMenuItems();
                 oApp.RegisterMenuEventHandler(MyMenu.SBO_Application_MenuEvent);
+                Appocalypto.Mob mob = new Appocalypto.Mob();
+                mob.Run(5);
                 Application.SBO_Application.AppEvent += new SAPbouiCOM._IApplicationEvents_AppEventEventHandler(SBO_Application_AppEvent);
                 oApp.Run();
             }

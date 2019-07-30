@@ -121,7 +121,6 @@ namespace InventoryTransferBranch
                         goodsReceiptPo.Lines.Add();
                     }
 
-                    deliveryObj.Close();
                     var res = goodsReceiptPo.Add();
                     if (res == 0)
                     {
@@ -129,7 +128,18 @@ namespace InventoryTransferBranch
                         string docNum;
                         DiManager.Company.GetNewObjectCode(out docNum);
                         PostedGRPO postedGrpo = new PostedGRPO(docEntry, docNum);
-                        postedGrpo.Show();
+                        try
+                        {
+                            deliveryObj.UserFields.Fields.Item("U_GrpoDocEntry").Value = docEntry;
+                            deliveryObj.Update();
+                        }
+                        catch (Exception e)
+                        {
+                            var err1 = DiManager.Company.GetLastErrorDescription();
+                            SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("UDF - GrpoDocEntry დასამატებელია");
+                        }
+                        deliveryObj.Close();
+                        //postedGrpo.Show();
                     }
                     var err = DiManager.Company.GetLastErrorDescription();
                     if (string.IsNullOrWhiteSpace(err))
@@ -151,7 +161,7 @@ namespace InventoryTransferBranch
                     ((EditText)grpoForm.Items.Item("10").Specific).Value = deliveryObj.DocDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
                     ((EditText)grpoForm.Items.Item("12").Specific).Value = deliveryObj.DocDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
                     ((ComboBox)(grpoForm.Items.Item("2001").Specific)).Select(branchName);
-                    ((ComboBox)(grpoForm.Items.Item("234000016").Specific)).Select("G", BoSearchKey.psk_ByValue); //Price Mode
+                    //((ComboBox)(grpoForm.Items.Item("234000016").Specific)).Select("G", BoSearchKey.psk_ByValue); //Price Mode
 
                     for (int i = 0; i < deliveryObj.Lines.Count; i++)
                     {
@@ -160,17 +170,20 @@ namespace InventoryTransferBranch
                         SAPbouiCOM.EditText formItemCode = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("1").Cells.Item(p).Specific;
                         SAPbouiCOM.EditText formQuantity = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("11").Cells.Item(p).Specific;
                         SAPbouiCOM.EditText formWarehouseCode = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("24").Cells.Item(p).Specific;
-                        SAPbouiCOM.EditText grossPrice = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("288").Cells.Item(p).Specific;//gross
+                        SAPbouiCOM.EditText grossPrice;
 
-
+                        grossPrice =
+                            (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("14").Cells.Item(p).Specific; //gross
 
                         grpoForm.Freeze(true);
                         grpoFormMatrix.AddRow();
                         formItemCode.Value = deliveryObj.Lines.ItemCode;
                         formQuantity.Value = deliveryObj.Lines.Quantity.ToString(CultureInfo.InvariantCulture);
                         formWarehouseCode.Value = whs;
+
                         grossPrice.Value = double.Parse(costs[i], CultureInfo.InvariantCulture)
                             .ToString(CultureInfo.InvariantCulture);
+
                         grpoForm.Freeze(false);
                     }
                 }

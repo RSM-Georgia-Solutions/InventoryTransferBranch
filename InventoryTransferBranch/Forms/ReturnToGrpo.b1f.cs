@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using SAPbobsCOM;
 using SAPbouiCOM;
 using SAPbouiCOM.Framework;
+using Application = SAPbouiCOM.Framework.Application;
 
 namespace InventoryTransferBranch.Forms
 {
@@ -69,7 +70,16 @@ namespace InventoryTransferBranch.Forms
             Recordset recSet =
                 (Recordset)DiManager.Company.GetBusinessObject(BoObjectTypes
                     .BoRecordset);
-            recSet.DoQuery($"SELECT * FROM ODLN WHERE DocDate Between '{EditText0.Value}' And '{EditText1.Value}' And U_ImportType = '{ComboBox0.Selected.Value}' And BplId = {bplId} AND U_GrpoDocEntry is null");
+
+            try
+            {
+                recSet.DoQuery($"SELECT * FROM ODLN WHERE DocDate Between '{EditText0.Value}' And '{EditText1.Value}' And U_ImportType = '{ComboBox0.Selected.Value}' And BplId = {bplId} AND U_GrpoDocEntry is null");
+            }
+            catch (Exception e )
+            {
+                Application.SBO_Application.SetStatusBarMessage(e.Message,
+                    BoMessageTime.bmt_Short, true);
+            }
 
 
             
