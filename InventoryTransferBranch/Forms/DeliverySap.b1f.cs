@@ -131,14 +131,19 @@ namespace InventoryTransferBranch
                         try
                         {
                             deliveryObj.UserFields.Fields.Item("U_GrpoDocEntry").Value = docEntry;
-                            deliveryObj.Update();
+                            var result = deliveryObj.Update();
+                            if (result == 0)
+                            {
+                                deliveryObj.Close();
+                            }
+
                         }
                         catch (Exception e)
                         {
                             var err1 = DiManager.Company.GetLastErrorDescription();
                             SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("UDF - GrpoDocEntry დასამატებელია");
                         }
-                        deliveryObj.Close();
+
                         //postedGrpo.Show();
                     }
                     var err = DiManager.Company.GetLastErrorDescription();
@@ -160,7 +165,16 @@ namespace InventoryTransferBranch
                     ((EditText)(grpoForm.Items.Item("4").Specific)).Value = businessPartner.LinkedBusinessPartner;
                     ((EditText)grpoForm.Items.Item("10").Specific).Value = deliveryObj.DocDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
                     ((EditText)grpoForm.Items.Item("12").Specific).Value = deliveryObj.DocDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
-                    ((ComboBox)(grpoForm.Items.Item("2001").Specific)).Select(branchName);
+
+                    var branchCombo =  ((ComboBox) grpoForm.Items.Item("2001").Specific);
+                    try
+                    {
+                        ((ComboBox)grpoForm.Items.Item("2001").Specific).Select(branchName);
+                    }
+                    catch (Exception e)
+                    {
+                        //Database Without Branch
+                    }
                     //((ComboBox)(grpoForm.Items.Item("234000016").Specific)).Select("G", BoSearchKey.psk_ByValue); //Price Mode
 
                     for (int i = 0; i < deliveryObj.Lines.Count; i++)
