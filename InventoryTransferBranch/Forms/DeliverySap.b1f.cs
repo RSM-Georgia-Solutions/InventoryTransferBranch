@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using InventoryTransferBranch.Forms;
 using SAPbobsCOM;
 using SAPbouiCOM;
 using SAPbouiCOM.Framework;
@@ -23,10 +24,22 @@ namespace InventoryTransferBranch
         /// </summary>
         public override void OnInitializeComponent()
         {
-            this.Button0 = ((SAPbouiCOM.Button)(this.GetItem("Item_3333").Specific));
-            this.Button0.PressedAfter += new SAPbouiCOM._IButtonEvents_PressedAfterEventHandler(this.Button0_PressedAfter);
-            this.OnCustomInitialize();
+            Button0 = ((Button)(GetItem("Item_3333").Specific));
+            Button0.PressedAfter += new _IButtonEvents_PressedAfterEventHandler(Button0_PressedAfter);
+            OnCustomInitialize();
 
+        }
+
+        public static void CloseDliveryUpdayeGrpo(int deliveryDocEntry, int grpoDocEntry)
+        {
+            Documents deliveryObj = (Documents)DiManager.Company.GetBusinessObject(BoObjectTypes.oDeliveryNotes);
+            deliveryObj.GetByKey(deliveryDocEntry);
+            deliveryObj.UserFields.Fields.Item("U_GrpoDocEntry").Value = grpoDocEntry;
+            var result = deliveryObj.Update();
+            if (result == 0)
+            {
+                deliveryObj.Close();
+            }
         }
 
         /// <summary>
@@ -41,11 +54,11 @@ namespace InventoryTransferBranch
 
         }
 
-        private SAPbouiCOM.Button Button0;
+        private Button Button0;
 
-        private void Button0_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        private void Button0_PressedAfter(object sboObject, SBOItemEventArg pVal)
         {
-            Form deliveryForm = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm;
+            Form deliveryForm = Application.SBO_Application.Forms.ActiveForm;
 
 
             if (deliveryForm.Type == 140)
@@ -55,19 +68,28 @@ namespace InventoryTransferBranch
                 if (string.IsNullOrWhiteSpace(deliveryDocEntry))
                 {
                     Application.SBO_Application.SetStatusBarMessage("დოკუმენტი არაა დამატებული (Delivery)",
-                        BoMessageTime.bmt_Short, true);
+                        BoMessageTime.bmt_Short);
                     return;
                 }
 
                 deliveryObj.GetByKey(int.Parse(deliveryDocEntry));
-
-                if (deliveryObj.DocumentStatus == BoStatus.bost_Close)
+                var grpoDocEntry = deliveryObj.UserFields.Fields.Item("U_GrpoDocEntry").Value.ToString();
+                if (deliveryObj.DocumentStatus == BoStatus.bost_Close
+                    || grpoDocEntry != "0")
                 {
                     Application.SBO_Application.SetStatusBarMessage("უკვე გამოწერილია",
-                        BoMessageTime.bmt_Short, true);
+                        BoMessageTime.bmt_Short);
                     return;
                 }
 
+                BusinessPartners businessPartner = (BusinessPartners)DiManager.Company.GetBusinessObject(BoObjectTypes.oBusinessPartners);
+                businessPartner.GetByKey(deliveryObj.CardCode);
+                if (string.IsNullOrWhiteSpace(businessPartner.LinkedBusinessPartner))
+                {
+                    Application.SBO_Application.SetStatusBarMessage("მიუთითეთ \"Connected Vendor\" ",
+                        BoMessageTime.bmt_Short);
+                    return;
+                }
                 int clicked = Application.SBO_Application.MessageBox("გსურთ დაპოსტვამდე დააკორექტიროთ დოკუმენტი ?", 1, "დიახ", "არა");
 
                 var deliveryXmlString = deliveryObj.GetAsXML();
@@ -85,10 +107,6 @@ namespace InventoryTransferBranch
                 {
 
                 }
-
-                BusinessPartners businessPartner = (BusinessPartners)DiManager.Company.GetBusinessObject(BoObjectTypes.oBusinessPartners);
-                businessPartner.GetByKey(deliveryObj.CardCode);
-
                 string whs = string.Empty;
                 try
                 {
@@ -97,9 +115,16 @@ namespace InventoryTransferBranch
                 catch (Exception e)
                 {
                     Application.SBO_Application.SetStatusBarMessage("WareHouse ველი დასამატებელია",
-                        BoMessageTime.bmt_Short, true);
+                        BoMessageTime.bmt_Short);
+                    return;
                 }
 
+                if (string.IsNullOrWhiteSpace(whs))
+                {
+                    Application.SBO_Application.SetStatusBarMessage("შეავსეთ მიმღები საწყობი",
+                        BoMessageTime.bmt_Short);
+                    return;
+                }
                 DiManager.Recordset.DoQuery(DiManager.QueryHanaTransalte($"SELECT OBPL.BPLName, OBPL.BPLId FROM OWHS JOIN OBPL ON OWHS.BPLid = OBPL.BPLId WHERE OWHS.WhsCode = N'{whs}'"));
                 int branchId = int.Parse(DiManager.Recordset.Fields.Item("BPLid").Value.ToString());
                 string branchName = DiManager.Recordset.Fields.Item("BPLName").Value.ToString();
@@ -141,7 +166,7 @@ namespace InventoryTransferBranch
                         catch (Exception e)
                         {
                             var err1 = DiManager.Company.GetLastErrorDescription();
-                            SAPbouiCOM.Framework.Application.SBO_Application.MessageBox("UDF - GrpoDocEntry დასამატებელია");
+                            Application.SBO_Application.MessageBox("UDF - GrpoDocEntry დასამატებელია");
                         }
 
                         //postedGrpo.Show();
@@ -149,15 +174,17 @@ namespace InventoryTransferBranch
                     var err = DiManager.Company.GetLastErrorDescription();
                     if (string.IsNullOrWhiteSpace(err))
                     {
-                        SAPbouiCOM.Framework.Application.SBO_Application.StatusBar.SetSystemMessage("წარმატება", BoMessageTime.bmt_Short, BoStatusBarMessageType.smt_Success);
+                        Application.SBO_Application.StatusBar.SetSystemMessage("წარმატება", BoMessageTime.bmt_Short, BoStatusBarMessageType.smt_Success);
                     }
                     else
                     {
-                        SAPbouiCOM.Framework.Application.SBO_Application.StatusBar.SetSystemMessage(err, BoMessageTime.bmt_Short);
+                        Application.SBO_Application.StatusBar.SetSystemMessage(err, BoMessageTime.bmt_Short);
                     }
                 }
                 else
                 {
+                    GrpoSap1.FromDelivery = true;
+                    GrpoSap1.DeliveryDocEntry = deliveryObj.DocEntry;
                     Application.SBO_Application.ActivateMenuItem("2306");
                     Form grpoForm = Application.SBO_Application.Forms.ActiveForm;
                     Matrix grpoFormMatrix = (Matrix)Application.SBO_Application.Forms.ActiveForm.Items.Item("38").Specific;
@@ -165,8 +192,9 @@ namespace InventoryTransferBranch
                     ((EditText)(grpoForm.Items.Item("4").Specific)).Value = businessPartner.LinkedBusinessPartner;
                     ((EditText)grpoForm.Items.Item("10").Specific).Value = deliveryObj.DocDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
                     ((EditText)grpoForm.Items.Item("12").Specific).Value = deliveryObj.DocDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
-
-                    var branchCombo =  ((ComboBox) grpoForm.Items.Item("2001").Specific);
+                    ComboBox comboItemType = (ComboBox)grpoForm.Items.Item("3").Specific;
+                    comboItemType.Select(0, BoSearchKey.psk_Index);
+                    var branchCombo = ((ComboBox)grpoForm.Items.Item("2001").Specific);
                     try
                     {
                         ((ComboBox)grpoForm.Items.Item("2001").Specific).Select(branchName);
@@ -181,13 +209,12 @@ namespace InventoryTransferBranch
                     {
                         int p = i + 1;
                         deliveryObj.Lines.SetCurrentLine(i);
-                        SAPbouiCOM.EditText formItemCode = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("1").Cells.Item(p).Specific;
-                        SAPbouiCOM.EditText formQuantity = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("11").Cells.Item(p).Specific;
-                        SAPbouiCOM.EditText formWarehouseCode = (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("24").Cells.Item(p).Specific;
-                        SAPbouiCOM.EditText grossPrice;
-
+                        EditText formItemCode = (EditText)grpoFormMatrix.Columns.Item("1").Cells.Item(p).Specific;
+                        EditText formQuantity = (EditText)grpoFormMatrix.Columns.Item("11").Cells.Item(p).Specific;
+                        EditText formWarehouseCode = (EditText)grpoFormMatrix.Columns.Item("24").Cells.Item(p).Specific;
+                        EditText grossPrice;
                         grossPrice =
-                            (SAPbouiCOM.EditText)grpoFormMatrix.Columns.Item("14").Cells.Item(p).Specific; //gross
+                            (EditText)grpoFormMatrix.Columns.Item("14").Cells.Item(p).Specific; //gross
 
                         grpoForm.Freeze(true);
                         grpoFormMatrix.AddRow();
